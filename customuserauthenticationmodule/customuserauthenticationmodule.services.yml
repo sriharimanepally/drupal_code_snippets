@@ -1,0 +1,4 @@
+services:
+  user.auth:
+    class: Drupal\customuserauthenticationmodule\CustomUserAuth
+    arguments: ['@entity.manager', '@password']

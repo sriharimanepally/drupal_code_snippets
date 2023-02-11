@@ -1,0 +1,6 @@
+name: Custom User Login Authentication
+type: module
+description: 'Custom User Login Authentication created by Srihari.'
+package: Custom
+version: 1.x
+core: 8.x

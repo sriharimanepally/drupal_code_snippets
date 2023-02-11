@@ -1,0 +1,6 @@
+name: Custom User Login Register
+type: module
+description: 'Custom module to change the functionality and structure of Core Forms like UserLoginForm, Register Form.'
+package: Custom
+verion: 8.x
+core: 8.x

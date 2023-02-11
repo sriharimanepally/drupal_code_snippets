@@ -1,0 +1,5 @@
+services:
+  custom_user_login_register.route_subscriber:
+    class: Drupal\custom_user_login_register\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

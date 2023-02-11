@@ -1,0 +1,14 @@
+ace_theme_user_login_register.custom_user_login:
+  css:
+    theme:
+      css/custom_user_login_register.css: {}
+  js:
+    js/custom_user_login.js: {}
+
+ace_theme_user_login_register.telinputflag:
+  version: VERSION
+  css:
+    theme:
+      js/intl-tel-input-master/build/css/intlTelInput.css: {}
+  js:
+    js/intl-tel-input-master/build/js/intlTelInput-jquery.min.js: {}

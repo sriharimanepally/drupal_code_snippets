@@ -1,0 +1,5 @@
+services:
+  ace_theme_user_login_register.route_subscriber:
+    class: Drupal\ace_theme_user_login_register\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

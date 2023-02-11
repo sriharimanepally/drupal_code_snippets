@@ -1,0 +1,6 @@
+name: User login register Ace Theme
+type: module
+description: 'Custom module to override user login register.'
+package: Custom
+version: 1.x
+core: 8.x

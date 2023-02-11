@@ -1,0 +1,7 @@
+ajax_branch_names.ajax_form:
+  path: '/ajax-branch-names'
+  defaults:
+    _form: '\Drupal\ajax_branch_names\Form\AjaxBranchNamesForm'
+    _title: 'Ajax Branch Names'
+  requirements:
+    _permission: 'access content'

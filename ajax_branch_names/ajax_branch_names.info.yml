@@ -1,0 +1,5 @@
+name: Ajax branch names
+type: module
+description: Ajax branch names, example module of ajax from https://mycode.blog/lakshmi/implement-ajax-callback-function-drupal-89
+core_version_requirement: ^9 || ^10
+package: Custom

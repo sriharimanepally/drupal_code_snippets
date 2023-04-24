@@ -1,0 +1,6 @@
+name: medical dictional
+description: medical dictionary app definations defined.
+package: Custom
+type: module
+version: 1.0
+core: 8.x

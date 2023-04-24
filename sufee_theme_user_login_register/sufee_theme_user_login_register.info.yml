@@ -1,0 +1,6 @@
+name: User login register Suffee Theme
+type: module
+description: 'Custom module to override user login register.'
+package: Custom
+version: 8.x
+core: 8.x

@@ -1,0 +1,15 @@
+cool_admin_theme_user_login_register.send_verification_code:
+  path: '/send_verification_code'
+  defaults: { _controller: '\Drupal\cool_admin_theme_user_login_register\Controller\CustomUserLoginRegister::sendVerificationCode' }
+  methods:  [POST]
+  requirements:
+    _access: 'TRUE'
+    _format: json
+
+cool_admin_theme_user_login_register.verify_code:
+  path: '/verify_code'
+  defaults: { _controller: '\Drupal\cool_admin_theme_user_login_register\Controller\CustomUserLoginRegister::verifyCode' }
+  methods:  [POST]
+  requirements:
+    _access: 'TRUE'
+    _format: json

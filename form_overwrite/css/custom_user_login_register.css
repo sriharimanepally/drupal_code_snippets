@@ -1,0 +1,3 @@
+#block-matrix-theme-branding,#block-matrix-theme-account-menu > ul,#block-matrix-theme-main-menu > ul,#block-matrix-theme-page-title > h1,#block-matrix-theme-local-tasks > ul,#edit-contact,#edit-timezone,#header{
+    display: none;
+}

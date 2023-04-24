@@ -1,0 +1,6 @@
+name: User login register form overwrite
+type: module
+description: 'Custom module to override user login register.'
+package: Custom
+version: 8.x
+core: 8.x

@@ -1,0 +1,22 @@
+ul.tabs--primary.nav.nav-tabs {
+    display: none;
+}
+div#edit-actions {
+    background-color: transparent;
+    border-top: 0px;
+}
+h1.js-quickedit-page-title.page-header {
+    display: none;
+}
+div#navbar {
+    display: none;
+}
+div.form-actions {
+    margin-top: 0px;
+     padding: 0px;
+}
+.signup-box .toolbar_new {
+    background: #5090C1;
+    border-top: 2px solid #597597;
+	padding: 9px 18px;
+}

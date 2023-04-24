@@ -1,0 +1,15 @@
+<?php
+
+function sufee_theme_user_login_register_entity_type_alter(array &$entity_types) {
+
+    $handler_classes = $entity_types['user']->getHandlerClasses();
+
+    if (isset($handler_classes['form'])) {
+
+    $handler_classes['form']['register'] = 'Drupal\sufee_theme_user_login_register\Form\NewUSerRegisterForm';
+
+    $entity_types['user']->setHandlerClass('form', $handler_classes['form']);
+
+    }
+
+}

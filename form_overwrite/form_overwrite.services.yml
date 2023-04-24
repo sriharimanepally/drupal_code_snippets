@@ -1,0 +1,5 @@
+services:
+  form_overwrite.route_subscriber:
+    class: Drupal\form_overwrite\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

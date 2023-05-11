@@ -6,7 +6,7 @@ function cool_admin_theme_user_login_register_entity_type_alter(array &$entity_t
 
     if (isset($handler_classes['form'])) {
 
-    $handler_classes['form']['register'] = 'Drupal\cool_admin_theme_user_login_register\Form\NewUSerRegisterForm';
+    $handler_classes['form']['register'] = 'Drupal\cool_admin_theme_user_login_register\Form\NewUserRegisterForm';
 
     $entity_types['user']->setHandlerClass('form', $handler_classes['form']);
 

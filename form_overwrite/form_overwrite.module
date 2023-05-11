@@ -6,7 +6,7 @@ function form_overwrite_entity_type_alter(array &$entity_types) {
 
     if (isset($handler_classes['form'])) {
 
-    $handler_classes['form']['register'] = 'Drupal\form_overwrite\Form\NewUSerRegisterForm';
+    $handler_classes['form']['register'] = 'Drupal\form_overwrite\Form\NewUserRegisterForm';
 
     $entity_types['user']->setHandlerClass('form', $handler_classes['form']);
 

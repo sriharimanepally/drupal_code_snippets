@@ -1,0 +1,13 @@
+name: 'Webform Navigation'
+type: module
+description: 'Creates a navigation setting for webform that allows users to navigate forwards and backwards through wizard pages when the wizard navigation progress bar is enabled.'
+core_version_requirement: ^9 || ^10
+package: 'Webform'
+dependencies:
+  - 'webform:webform'
+  - 'webform:webform_submission_log'
+
+# Information added by Drupal.org packaging script on 2023-01-24
+version: '2.0.1'
+project: 'webformnavigation'
+datestamp: 1674583764

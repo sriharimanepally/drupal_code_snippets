@@ -1,0 +1,6 @@
+twilio_otp_login.admin_settings_form:  
+  title: 'Twillio OTP login configuration'  
+  route_name: twilio_otp_login.settings  
+  description: 'Twillio OTP login configuration'  
+  parent: system.admin_config_system  
+  weight: 99 

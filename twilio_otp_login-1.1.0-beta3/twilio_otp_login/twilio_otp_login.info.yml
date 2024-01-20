@@ -1,0 +1,14 @@
+name: Twilio Otp Login
+
+type: module
+
+description: Login using Mobile number and OTP, uses  Twilio SMS gateway for sending OTP. Developed by DigitalNadeem.com.
+
+# version: 1.1
+
+core_version_requirement: ^9 || ^10
+
+# Information added by Drupal.org packaging script on 2023-10-22
+version: '1.1.0-beta3'
+project: 'twilio_otp_login'
+datestamp: 1697963626

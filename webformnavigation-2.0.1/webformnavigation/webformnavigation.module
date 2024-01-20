@@ -1,0 +1,219 @@
+<?php
+
+/**
+ * @file
+ * Contains webformnavigation.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\webform\WebformInterface;
+use Drupal\webform\WebformSubmissionStorageInterface;
+
+/**
+ * Implements hook_help().
+ */
+function webformnavigation_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the webformnavigation module.
+    case 'help.page.webformnavigation':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Allows users to navigate forwards and backwards through multi-page webforms using the wizard progress bar.') . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function webformnavigation_theme() {
+  return [
+    // Override the webform progress bar so we can add our page classes.
+    'webform_progress_bar' => [
+      'variables' => [
+        'webform' => NULL,
+        'webform_submission' => NULL,
+        'current_page' => NULL,
+        'operation' => NULL,
+        'max_pages' => 10,
+        'page_classes' => [],
+      ],
+    ],
+    // Override the webform progress tracker so we can add our page classes.
+    'webform_progress_tracker' => [
+      'variables' => [
+        'webform' => NULL,
+        'webform_submission' => NULL,
+        'current_page' => NULL,
+        'operation' => NULL,
+        'max_pages' => 10,
+        'page_classes' => [],
+      ],
+    ],
+    'webform_handler_webform_navigation_summary' => [
+      'variables' => ['settings' => NULL, 'handler' => []],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function webformnavigation_preprocess_webform_progress_tracker(&$variables) {
+  /** @var \Drupal\webform\WebformInterface $webform */
+  $webform = $variables['webform'];
+  /** @var \Drupal\webform\WebformSubmissionInterface $webform_submission */
+  $webform_submission = $variables['webform_submission'];
+  // Get navigation webform settings.
+  $forward_navigation = $webform->getThirdPartySetting('webformnavigation', 'forward_navigation');
+  // Set default forward navigation settings.
+  if ($forward_navigation && !empty($webform_submission)) {
+    $pages = $webform->getPages($variables['operation'], $webform_submission);
+    // Get the logged errors for the form.
+    /** @var \Drupal\webformnavigation\WebformNavigationHelper $webformnavigation_helper */
+    $webformnavigation_helper = Drupal::service('webformnavigation.helper');
+    $current_errors = $webformnavigation_helper->getErrors($webform_submission);
+    // Iterate through the pages and set appropriate page classes.
+    foreach ($pages as $key => $page) {
+      // Add the default class for the page.
+      $variables['page_classes'][$key][] = 'progress-step';
+      // Add the visited and error classes if it has been logged.
+      if (isset($current_errors[$key])) {
+        // Add an error class if the page has errors or complete class if not.
+        $variables['page_classes'][$key][] = empty($current_errors[$key]) ? 'is-complete' : 'has-errors';
+      }
+      // Add an active class to the current page.
+      if ($variables['current_page'] == $key) {
+        $variables['page_classes'][$key][] = 'is-active';
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function webformnavigation_preprocess_webform_progress_bar(&$variables) {
+  /** @var \Drupal\webform\WebformInterface $webform */
+  $webform = $variables['webform'];
+  /** @var \Drupal\webform\WebformSubmissionInterface $webform_submission */
+  $webform_submission = $variables['webform_submission'];
+  // Get navigation webform settings.
+  $forward_navigation = $webform->getThirdPartySetting('webformnavigation', 'forward_navigation');
+  // Set default forward navigation settings.
+  if ($forward_navigation && !empty($webform_submission)) {
+    $pages = $webform->getPages($variables['operation'], $webform_submission);
+    // Get the logged errors for the form.
+    /** @var \Drupal\webformnavigation\WebformNavigationHelper $webformnavigation_helper */
+    $webformnavigation_helper = Drupal::service('webformnavigation.helper');
+    $current_errors = $webformnavigation_helper->getErrors($webform_submission);
+    // Iterate through the pages and set appropriate page classes.
+    foreach ($pages as $key => $page) {
+      // Add the default class for the page.
+      $variables['page_classes'][$key][] = 'webform-progress-bar__page';
+      // Add the visited and error classes if it has been logged.
+      if (isset($current_errors[$key])) {
+        // Add an error class if the page has errors or complete class if not.
+        $variables['page_classes'][$key][] = empty($current_errors[$key]) ? 'webform-progress-bar__page--done' : 'webform-progress-bar__page--errors';
+      }
+      // Add an active class to the current page.
+      if ($variables['current_page'] == $key) {
+        $variables['page_classes'][$key][] = 'webform-progress-bar__page--current';
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_webform_third_party_settings_form_alter().
+ */
+function webformnavigation_webform_third_party_settings_form_alter(&$form, FormStateInterface $form_state) {
+  /** @var \Drupal\webform\WebformInterface $webform */
+  $webform = $form_state->getFormObject()->getEntity();
+
+  $form['third_party_settings']['webformnavigation'] = [
+    '#type' => 'details',
+    '#title' => t('Webform navigation settings'),
+    '#open' => TRUE,
+  ];
+  $form['third_party_settings']['webformnavigation']['forward_navigation_message'] = [
+    '#type' => 'webform_message',
+    '#message_type' => 'warning',
+    '#message_message' => t('You must enable the Webform Navigation submission handler under the <a href=":href">Emails / Handlers tab</a> for forward navigation to work.', [
+      ':href' => $webform->toUrl('handlers')->toString(),
+    ]),
+    '#states' => [
+      'visible' => [
+        [':input[name="third_party_settings[webformnavigation][forward_navigation]"]' => ['checked' => TRUE]],
+      ],
+    ],
+  ];
+  $form['third_party_settings']['webformnavigation']['forward_navigation'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Allow forward navigation when the wizard progress bar is enabled'),
+    '#default_value' => $webform->getThirdPartySetting('webformnavigation', 'forward_navigation'),
+    '#description' => t('Enabling forward navigation will also enable submission logging, saving of drafts, and draft purging for all users.'),
+  ];
+  $form['third_party_settings']['webformnavigation']['prevent_next_validation'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Prevent validation when the user presses the "Next Page" button.'),
+    '#default_value' => $webform->getThirdPartySetting('webformnavigation', 'prevent_next_validation'),
+    '#states' => [
+      'visible' => [
+        ':input[name="third_party_settings[webformnavigation][forward_navigation]"]' => ['checked' => TRUE],
+      ],
+    ],
+  ];
+  $form['third_party_settings']['webformnavigation']['additional_error_message'] = [
+    '#type' => 'textfield',
+    '#title' => t('Additional Final Submit Error Message'),
+    '#default_value' => $webform->getThirdPartySetting('webformnavigation', 'additional_error_message'),
+    '#description' => t('Additional Error message you would like to include in the final submission error message.'),
+  ];
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function webformnavigation_webform_presave(WebformInterface $webform) {
+  // Get navigation webform settings.
+  $forward_navigation = $webform->getThirdPartySetting('webformnavigation', 'forward_navigation');
+  // Set default forward navigation settings.
+  if ($forward_navigation) {
+    // Set an appropriate default purge setting.
+    if ($purge_setting = $webform->getSetting('purge')) {
+      switch ($purge_setting) {
+        // We need to make sure drafts are purged as well.
+        case WebformSubmissionStorageInterface::PURGE_COMPLETED:
+          $purge = WebformSubmissionStorageInterface::PURGE_ALL;
+          break;
+
+        default:
+          $purge = WebformSubmissionStorageInterface::PURGE_DRAFT;
+          break;
+      }
+    }
+    else {
+      $purge = WebformSubmissionStorageInterface::PURGE_DRAFT;
+    }
+    // Enable the draft save if not already set.
+    $draft_setting = $webform->getSetting('draft');
+    if ($draft_setting !== WebformInterface::DRAFT_ALL) {
+      $webform->setSetting('draft', WebformInterface::DRAFT_ALL);
+    }
+    // Set purge status to prevent clutter in the db.
+    if ($purge_setting !== WebformSubmissionStorageInterface::PURGE_ALL
+      || $purge_setting !== WebformSubmissionStorageInterface::PURGE_DRAFT) {
+      $webform->setSetting('purge', $purge);
+    }
+    // Add a purge time frame if not set.
+    if (empty($webform->getSetting('purge_days'))) {
+      $webform->setSetting('purge_days', 365);
+    }
+    // Enable the linking to wizard pages.
+    if (empty($webform->getSetting('wizard_progress_link'))) {
+      $webform->setSetting('wizard_progress_link', TRUE);
+    }
+  }
+}

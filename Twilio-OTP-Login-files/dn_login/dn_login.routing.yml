@@ -1,0 +1,14 @@
+dn_login.otp_form:
+  path: '/login-otp'
+  defaults:
+    _form: '\Drupal\dn_login\Form\OTPForm'
+    _title: 'OTP'
+  requirements:
+    _access: 'TRUE'
+dn_login.resend:
+  path: '/login-otp/resend'
+  defaults:
+    _controller: '\Drupal\dn_login\Controller\ResendController::resend'
+    _title: 'Resend'
+  requirements:
+    _permission: 'access content'

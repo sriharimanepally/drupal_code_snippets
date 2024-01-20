@@ -1,0 +1,22 @@
+twilio_otp_login.otp_form:
+  path: '/login-otp'
+  defaults:
+    _form: '\Drupal\twilio_otp_login\Form\OTPForm'
+    _title: 'OTP'
+  requirements:
+    _access: 'TRUE'
+twilio_otp_login.resend:
+  path: '/login-otp/resend'
+  defaults:
+    _controller: '\Drupal\twilio_otp_login\Controller\ResendController::resend'
+    _title: 'Resend'
+  requirements:
+    _permission: 'access content'
+
+twilio_otp_login.settings:
+  path: '/admin/config/twilio_otp_login/settings'
+  defaults:
+    _form: '\Drupal\twilio_otp_login\Form\OtpSettingsForm'
+    _title: 'Twillio Settings form'
+  requirements:
+    _permission: 'administer site configuration'

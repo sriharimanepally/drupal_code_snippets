@@ -1,0 +1,7 @@
+services:
+  dn_login.otp:
+    class: Drupal\dn_login\Services\Otp
+    arguments: ['@database', '@password', '@tempstore.private','@session_manager','@current_user']
+  dn_login.localStorage:
+    class: Drupal\dn_login\Services\LocalStorage
+    arguments: ['@tempstore.private','@session_manager','@current_user']

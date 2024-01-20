@@ -1,0 +1,6 @@
+name: Ajax elements in Drupal form tables
+type: module
+description: Ajax elements buttons in table https://www.webomelette.com/ajax-elements-drupal-form-tables.
+package: Custom
+core: 8.x
+core_version_requirement: ^8 || ^9 || ^10

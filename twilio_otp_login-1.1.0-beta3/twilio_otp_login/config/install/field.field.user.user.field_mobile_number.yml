@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_mobile_number
+  module:
+    - user
+  enforced:
+    module:
+    - twilio_otp_login
+id: user.user.field_mobile_number
+field_name: field_mobile_number
+entity_type: user
+bundle: user
+label: 'mobile number'
+description: 'Provide mobile number with country code, Ex: for inida +91xxxxxxxxx'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

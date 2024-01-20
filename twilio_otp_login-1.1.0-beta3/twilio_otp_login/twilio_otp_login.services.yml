@@ -1,0 +1,7 @@
+services:
+  twilio_otp_login.otp:
+    class: Drupal\twilio_otp_login\Services\Otp
+    arguments: ['@database', '@password', '@tempstore.private','@session_manager','@current_user']
+  twilio_otp_login.localStorage:
+    class: Drupal\twilio_otp_login\Services\LocalStorage
+    arguments: ['@tempstore.private','@session_manager','@current_user']

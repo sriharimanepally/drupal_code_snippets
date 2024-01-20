@@ -1,0 +1,7 @@
+webomelette_ajax_table.tableform:
+  path: '/admin/structure/webomelette_ajax_table/tableform'
+  defaults:
+    _title: 'Ajax Table Form'
+    _form: '\Drupal\webomelette_ajax_table\Form\TableForm'
+  requirements:
+    _permission: 'administer'

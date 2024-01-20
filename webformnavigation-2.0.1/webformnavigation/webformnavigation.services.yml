@@ -1,0 +1,4 @@
+services:
+  webformnavigation.helper:
+    class: \Drupal\webformnavigation\WebformNavigationHelper
+    arguments: ['@webform_submission_log.manager', '@database', '@messenger', '@entity_type.manager', '@form_builder', '@current_user', '@tempstore.private']

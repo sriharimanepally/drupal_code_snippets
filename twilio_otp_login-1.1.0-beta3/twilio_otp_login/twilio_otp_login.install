@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for twilio_otp_login module.
+ */
+
+/**
+ * Database schema.
+ */
+function twilio_otp_login_schema() {
+  $schema['twilio_otp_login'] = [
+    'description' => 'Stores the generated OTP per user.',
+    'fields'      => [
+      'uid' => [
+        'description' => 'UID of the User.',
+        'type'        => 'int',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+        'default'     => 0,
+      ],
+      'otp' => [
+        'description' => 'Hashed otp of the User.',
+        'type'        => 'varchar_ascii',
+        'length'      => 255,
+        'not null'    => TRUE,
+        'default'     => 0,
+      ],
+      'expiration' => [
+        'description' => 'Time when otp will expire.',
+        'type'        => 'varchar_ascii',
+        'length'      => 50,
+        'not null'    => TRUE,
+        'default'     => 0,
+      ],
+    ],
+  ];
+  return $schema;
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function twilio_otp_login_requirements($phase) {
+  $requirements = [];
+
+  if (!class_exists('\Twilio\Rest\Client')) {
+    $requirements['twilio_otp_login_dependencies'] = [
+      'title' => t('Twilio'),
+      'description' => t('Twilio has unmet Composer dependencies. Read the <a href="@url">documentation</a> on how to install them.', [
+        '@url' => 'https://www.drupal.org/node/2627292',
+      ]),
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+
+  return $requirements;
+}
+
+function twilio_otp_login_install(){
+
+  // Rebuild user entity form display for mobile number field.
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_form_display');
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $user_form_display */
+  $user_form_display = $storage->load('user.user.default');
+  if (!$user_form_display) {
+    $user_form_display = $storage->create([
+      'targetEntityType' => 'user',
+      'bundle' => 'user',
+      'mode' => 'default',
+      'status' => TRUE,
+    ]);
+  }
+  $user_form_display
+    ->setComponent('field_mobile_number', [
+      'type' => 'string_textfield',
+      'weight' => 4,
+      'settings' => ['display_label' => TRUE],
+      'hidden' => FALSE,
+    ])
+    ->save();
+
+}
+

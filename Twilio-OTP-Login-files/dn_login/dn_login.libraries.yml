@@ -1,0 +1,13 @@
+dn_login.front:
+  js:
+    js/otp.js: {}
+  css:
+    theme:
+      css/otp.css: {}
+  dependencies:
+    - core/drupalSettings
+    - core/jquery.once
+    - core/jquery
+    - core/jquery.form
+    - core/drupal.ajax
+    - core/drupal

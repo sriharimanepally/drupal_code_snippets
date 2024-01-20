@@ -1,0 +1,11 @@
+name: DN Login 
+
+type: module
+
+description: Single field Login Sample by DigitalNadeem.com.
+
+package: Custom
+
+version: 1.0
+
+core_version_requirement: ^9 || ^10

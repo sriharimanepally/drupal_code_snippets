@@ -1,0 +1,204 @@
+<?php
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Ajax\RedirectCommand;
+
+use Drupal\Core\Url;
+
+use Drupal\user\UserInterface;
+use Drupal\user\UserStorageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation;
+
+use Twilio\Exceptions\RestException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use \Drupal\Core\Entity\Entity\EntityFormDisplay;
+
+/**
+ * Implements hook_user_login_form_alter().
+ */
+function twilio_otp_login_form_alter(&$form, FormStateInterface $formState, $form_id) {
+   
+    if ($form_id == 'user_login_form'){
+      
+
+    //$flood_config = \Drupal::service('config.factory')->getEditable('user.flood');
+     
+            unset($form['#submit'][0]);
+            unset($form['name']);
+            unset($form["#validate"]);
+            unset($form['pass']);
+            $form['#validate'][] = 'validateMobile';
+            $form['actions']['submit']['#submit'][] = 'phone_login_callback';
+            $form['mobilenumber'] = [
+            '#type' => 'tel',
+            '#title' => t('Mobile Number'),
+            '#description' => t('Enter the Mobilenumber with country code, For eg: +91--yournumber for India'),
+            '#required' => TRUE,
+            '#maxlength' => 60,
+            '#attributes' => ['class' => ['mobile-number-login']],
+            '#size' => 60,
+            '#weight' => -49,
+        ];
+    }
+}
+
+/**
+   * Sets an error if mobile number valid.
+   */
+   function validateMobile(array &$form, FormStateInterface $form_state) {
+
+    if($form_state->isValueEmpty('mobilenumber')){
+       $form_state->setErrorByName('mobilenumber', 'Enter Mobile number');
+       return;
+       
+    }
+
+    if(!(getNameFromPhone($form_state->getValue('mobilenumber')))){
+
+      $form_state->setErrorByName('mobilenumber', 'Mobile number Not Registered');
+
+      return;
+      
+   }
+
+  if(getNameFromPhone($form_state->getValue('mobilenumber'))){
+    if (!$form_state->isValueEmpty('mobilenumber') && user_is_blocked(getNameFromPhone($form_state->getValue('mobilenumber')))) {
+      // Blocked in user administration.
+      $form_state->setErrorByName('mobilenumber', 'The user with phone number  %mobilenumber has not been activated or is blocked.', ['%mobilenumber' => $form_state->getValue('mobilenumber')]);
+     
+    }
+  }
+
+}
+
+/*
+$form_display = EntityFormDisplay::load('user.' . 'facebook' . '.default');
+if (!$form_display) {
+  $form_display = EntityFormDisplay::create([
+    'targetEntityType' => 'user',
+    'bundle' => 'facebook',
+    'mode' => 'default',
+    'status' => TRUE,
+  ])->setComponent('field_facebook', [
+    'region' => 'content',
+    'type' => 'string_textfield',
+    'weight' => 5,
+    'hidden' => FALSE,
+  ])
+  ->save();
+}*/
+
+/*function twilio_otp_login_install() {
+
+    $form_display = EntityFormDisplay::load('user.' . 'user' . '.default');
+    if (!$form_display) {
+        $form_display = EntityFormDisplay::create([
+          'targetEntityType' => 'user',
+          'bundle' => 'user',
+          'mode' => 'default',
+          'status' => TRUE,
+        ])->setComponent('field_mobile_number', [
+          'region' => 'content',
+          'type' => 'string_textfield',
+          'weight' => 3,
+          'settings' => ['display_label' => TRUE],
+          'hidden' => FALSE,
+        ])
+        ->save();
+      }
+}*/
+/*function twilio_otp_login_uninstall() {
+
+  $module_path = \Drupal::service('extension.list.module')->getPath('twilio_otp_login') . '/config/install';
+
+  $configs = [];
+  $files = \Drupal::service('file_system')->scanDirectory($module_path, '/\.yml$/');
+
+  if ($files) {
+    foreach ($files as $file) {
+        $configs[] = $file->name;
+    }
+
+    foreach ($configs as $config_name) {
+        \Drupal::configFactory()->getEditable($config_name)->delete();
+    }
+
+    return TRUE;
+  }
+}*/
+
+function getNameFromPhone($mobileno){
+
+  $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['field_mobile_number' => $mobileno]);
+  $user = $users ? reset($users) : FALSE;
+    
+    if ($user) {
+      return $user->getAccountName();
+    }else{
+
+      return FALSE;
+    }
+
+}
+
+/**
+ * Login form ajax callback.
+ */
+function phone_login_callback(&$form, FormStateInterface $form_state) {
+  
+  
+ $mobile = $form_state->getValue('mobilenumber');
+ 
+  if ($form_state->getErrors()) {
+   
+    unset($form['#prefix']);
+    unset($form['#suffix']);
+    $form['status_messages'] = [
+      '#type' => 'status_messages',
+      '#weight' => -10,
+    ];
+    $form_state->setRebuild();
+   
+  }else{
+    
+    $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['field_mobile_number' => $mobile]);
+  
+    $user = $users ? reset($users) : FALSE;
+    
+    if ($user) {
+      $form_state->setValue('name', $user->getAccountName());
+      $account = user_load_by_name($user->getAccountName());
+      //=====load otp service
+     $otp = \Drupal::service('twilio_otp_login.otp');
+      
+       $otp_code = $otp->generate($user->getAccountName());
+       
+       $callService = \Drupal::service('twilio_otp_login.localStorage');
+    
+      //==============sending SMS
+      if ($otp_code && $otp->send($otp_code,$mobile)) {
+        \Drupal::messenger()->addMessage(t('An OTP was sent to your mobile number. Please check your Message.'));
+        
+       
+        $form_state->setRedirect('twilio_otp_login.otp_form');
+        
+      }
+      //==============sending SMS
+
+     
+    }else{
+       
+       $form_state->setRebuild();
+       $form_state->setErrorByName('mobilenumber', 'User doesnot exist');
+       return;
+
+    }
+    
+  } 
+
+  
+
+}
